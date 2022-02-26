@@ -1,9 +1,13 @@
 package br.edu.ifpb.padroes;
+
+import br.edu.ifpb.padroes.valores.DefinirValor;
+import br.edu.ifpb.padroes.valores.VALOR_DIARIA;
+import br.edu.ifpb.padroes.valores.VALOR_HORA;
+import br.edu.ifpb.padroes.valores.VALOR_MENSALIDADE;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.LocalDateTime;
 
 @Getter
@@ -14,23 +18,20 @@ public class Estacionamento {
     private LocalDateTime saida;
     private Veiculo veiculo;
 
-    public static BigDecimal VALOR_HORA = new BigDecimal("2.00");
-    public static BigDecimal VALOR_DIARIA = new BigDecimal("26.00");
-    public static BigDecimal VALOR_MENSALIDADE = new BigDecimal("300.00");
+    private Calculadora calculadora = new Calculadora();
+    private BigDecimal valor = new BigDecimal(0);
+
+    public static DefinirValor VALOR_HORA = new VALOR_HORA();
+    public static DefinirValor VALOR_DIARIA = new VALOR_DIARIA();
+    public static DefinirValor VALOR_MENSAL = new VALOR_MENSALIDADE();
+
+    public static BigDecimal VALOR_MENSALIDADE = VALOR_MENSAL.multiply(new BigDecimal(1));;
 
     public BigDecimal obterTotalAPagar() {
         assert(entrada != null && saida != null && veiculo != null);
-        long periodoHoras = Duration.between(entrada, saida).toHours();
-        long periodoDias = Duration.between(entrada, saida).toDays();
 
-        BigDecimal valor = new BigDecimal(0);
-        if (periodoHoras < 12) {
-            valor = VALOR_HORA.multiply(new BigDecimal(periodoHoras));
-        } else if (periodoHoras > 12 && periodoDias < 15) {
-            valor = VALOR_DIARIA.multiply(new BigDecimal(periodoDias));
-        } else if (periodoDias > 15) {
-            valor = VALOR_MENSALIDADE;
-        }
+        Calculadora tipo = new Calculadora();
+        BigDecimal valor = tipo.calcularDuracao(entrada, saida);
 
         return valor;
     }
